@@ -21,39 +21,54 @@ import br.com.camel.webhook.route.Route;
  */
 @Service
 public class WebhookService {
-	
+
 	private static Logger log = LoggerFactory.getLogger(WebhookService.class);
-	 
+
 	@Autowired
 	private CamelContext camelContext;
-	
-   @Value("activemq:topic:topico_people")
-   private String jmsTopic;
-	
-	public WebhookService() { }
 
+	@Value("activemq:topic:topico_people")
+	private String jmsTopic;
+
+	public WebhookService() {
+	}
+
+	/**
+	 * 
+	 * @param system Aqui será adicionado a(s) rota(s) que será(ão) disparada(s)
+	 */
 	public void add(System system) {
-	      try {
-	         camelContext.addRoutes(new Route(jmsTopic, system));
-	      } catch (Exception e) {
-	         e.printStackTrace();
-	         log.error(e.getMessage());
-	      }
-	   }
-	 
-	   public void remove(System sistem) {
-	      try {
-	         camelContext.stop();
-	         camelContext.removeRoute(sistem.getName());       
-	      } catch (Exception e) {
-	         e.printStackTrace();
-	         log.error("Não foi possivel remover [" + sistem.getName() +"]");
-	      }
-	   }
-	 
-	   public void notify(People pessoa) {
-	      ProducerTemplate template = camelContext.createProducerTemplate();
-	      template.sendBody(jmsTopic, pessoa);
-	   }
-	
+		try {
+			camelContext.addRoutes(new Route(jmsTopic, system));
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error(e.getMessage());
+		}
+	}
+
+	/**
+	 * 
+	 * @param sistem
+	 * Aqui a rota será removida
+	 */
+	public void remove(System sistem) {
+		try {
+			camelContext.stop();
+			camelContext.removeRoute(sistem.getName());
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("Não foi possivel remover [" + sistem.getName() + "]");
+		}
+	}
+
+	/**
+	 * 
+	 * @param pessoa
+	 * Aqui o haverá a notificação para o endpoint cadastrado
+	 */
+	public void notify(People pessoa) {
+		ProducerTemplate template = camelContext.createProducerTemplate();
+		template.sendBody(jmsTopic, pessoa);
+	}
+
 }
